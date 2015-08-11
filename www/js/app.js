@@ -67,6 +67,30 @@ angular.module('todo', ['ionic'])
         $ionicSideMenuDelegate.toggleLeft(false);
       };
 
+      $scope.deleteProject = function(project) {
+        if (!$scope.projects || !project) {
+          return;
+        }
+
+        var projects = [];
+
+        for (var i = 0; i < $scope.projects.length; i++) {
+          if ($scope.projects[i].title !== project.title) {
+            projects.push({
+              title: $scope.projects[i].title,
+              tasks: $scope.projects[i].tasks,
+            });
+          }
+        }
+
+        $scope.projects = projects;
+
+        // Inefficient, but save all the projects
+        Projects.save($scope.projects);
+
+        $scope.activeProject = $scope.projects[Projects.getLastActiveIndex()];
+      };
+
       // Create our modal
       $ionicModal.fromTemplateUrl('new-task.html', function(modal) {
         $scope.taskModal = modal;
@@ -87,6 +111,27 @@ angular.module('todo', ['ionic'])
         Projects.save($scope.projects);
 
         task.title = "";
+      };
+
+      $scope.deleteTask = function(task) {
+        if (!$scope.activeProject || !task) {
+          return;
+        }
+
+        var tasks = [];
+
+        for (var i = 0; i < $scope.activeProject.tasks.length; i++) {
+          if ($scope.activeProject.tasks[i].title !== task.title) {
+            tasks.push({
+              title: $scope.activeProject.tasks[i].title
+            });
+          }
+        }
+
+        $scope.activeProject.tasks = tasks;
+
+        // Inefficient, but save all the projects
+        Projects.save($scope.projects);
       };
 
       $scope.newTask = function() {
